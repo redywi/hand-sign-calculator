@@ -139,6 +139,13 @@ def calculate_result(left, right, operation):
     last_result = result  # Simpan hasil terakhir
     return result
 
+def draw_text_with_stroke(frame, text, position, font, scale, color, thickness, stroke_color, stroke_thickness):
+    # Gambar stroke hitam
+    x, y = position
+    cv2.putText(frame, text, (x, y), font, scale, stroke_color, stroke_thickness, lineType=cv2.LINE_AA)
+    # Gambar teks utama
+    cv2.putText(frame, text, (x, y), font, scale, color, thickness, lineType=cv2.LINE_AA)
+
 def main():
     global active_operation, left_hand_signs_detected, right_hand_signs_detected, operation_processed, last_result
 
@@ -156,11 +163,31 @@ def main():
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         results = hands.process(frame_rgb)
 
-        # Gambar tombol operasi
+        # Gambar tombol operasi dengan ukuran yang sesuai teks
+        margin = 10  # Margin di sekitar teks
+        y_offset = 50  # Offset vertikal untuk tombol
+
         for i, (symbol, label) in enumerate(operations.items()):
-            color = (0, 255, 0) if active_operation == symbol else (255, 255, 255)
-            cv2.rectangle(frame, (10, 50 + i * 50), (60, 90 + i * 50), color, -1)
-            cv2.putText(frame, symbol, (15, 85 + i * 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
+            text_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)
+            text_width, text_height = text_size[0]
+            text_baseline = text_size[1]
+
+            # Tentukan koordinat kotak berdasarkan ukuran teks
+            x1, y1 = 10, y_offset + i * (text_height + 2 * margin + 10)
+            x2, y2 = x1 + text_width + 2 * margin, y1 + text_height + 2 * margin
+
+            # Warna kotak berdasarkan status aktif
+            color_fill = (50, 205, 50) if active_operation == symbol else (255, 255, 255)
+            color_outline = (0, 128, 0) if active_operation == symbol else (0, 0, 0)
+
+            # Gambar kotak tombol
+            cv2.rectangle(frame, (x1, y1), (x2, y2), color_outline, 2)
+            cv2.rectangle(frame, (x1 + 2, y1 + 2), (x2 - 2, y2 - 2), color_fill, -1)
+
+            # Tambahkan label pada tombol (teks di tengah kotak)
+            text_x = x1 + margin
+            text_y = y1 + text_height + margin
+            cv2.putText(frame, label, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
 
         # Deteksi tangan
         if results.multi_hand_landmarks:
@@ -187,22 +214,31 @@ def main():
                         right_hand_signs_detected = []
                         active_operation = selected_operation
                         operation_processed = False  # Reset saat operasi berubah
+                
+                x = int(hand_landmarks.landmark[8].x * w)
+                y = int(hand_landmarks.landmark[8].y * h)
+                selected_operation = detect_operation(x, y)
+                if selected_operation:
+                    if selected_operation != active_operation:
+                        left_hand_signs_detected = []
+                        right_hand_signs_detected = []
+                        active_operation = selected_operation
+                        operation_processed = False
 
-        # Tampilkan hasil perhitungan
+        if left_hand_signs_detected:
+            draw_text_with_stroke(frame, f"Kiri: {left_hand_signs_detected[0]}", (200, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, (0, 0, 0), 3)
+        if right_hand_signs_detected:
+            draw_text_with_stroke(frame, f"Kanan: {right_hand_signs_detected[0]}", (200, 200), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, (0, 0, 0), 3)
+
+        # Tampilkan hasil
         if active_operation and left_hand_signs_detected and right_hand_signs_detected:
             result = calculate_result(left_hand_signs_detected[0], right_hand_signs_detected[0], active_operation)
             if result is not None:
-                cv2.putText(frame, f"Result: {result}", (200, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
-
-        # Tampilkan input tangan kiri dan kanan
-        if left_hand_signs_detected:
-            cv2.putText(frame, f"Left: {left_hand_signs_detected[0]}", (200, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-        if right_hand_signs_detected:
-            cv2.putText(frame, f"Right: {right_hand_signs_detected[0]}", (200, 200), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-
-        # Tampilkan operasi aktif
+                draw_text_with_stroke(frame, f"Hasil: {result}", (200, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2, (0, 0, 0), 3)
+        
         if active_operation:
-            cv2.putText(frame, f"Operation: {active_operation}", (200, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2)
+            operation_label = operations.get(active_operation, "")
+            draw_text_with_stroke(frame, f"Operasi: {operation_label}", (200, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2, (0, 0, 0), 3)
 
         cv2.imshow("Hand Sign Calculator", frame)
 
