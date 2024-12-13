@@ -2,19 +2,35 @@
 import cv2
 import mediapipe as mp
 import numpy as np
+import pygame
+import time
+
+# Inisialisasi pygame mixer
+pygame.mixer.init()
+
+# Load file audio
+sound_click = pygame.mixer.Sound("sfx/click.mp3")  # Suara untuk klik operasi
+sound_success = pygame.mixer.Sound("sfx/succes.mp3")  # Suara untuk hasil kalkulasi
+sound_error = pygame.mixer.Sound("sfx/error.mp3")  # Suara untuk kesalahan (misalnya, pembagian dengan nol)
 
 # Inisialisasi Mediapipe
 mp_hands = mp.solutions.hands
 hands = mp_hands.Hands(min_detection_confidence=0.7, min_tracking_confidence=0.5)
 mp_drawing = mp.solutions.drawing_utils
 
-# Variabel global untuk menyimpan simbol tangan yang terdeteksi dan operasi aktif
+# Variabel global
 left_hand_signs_detected = []
 right_hand_signs_detected = []
 active_operation = None
+operation_processed = False  # Flag untuk memastikan operasi hanya diproses sekali
+last_result = None  # Variabel untuk menyimpan hasil terakhir
 operations = {"+": "Tambah", "-": "Kurang", "*": "Kali", "/": "Bagi"}
 
-def detect_hand_sign(landmarks, handedness):
+# Variabel untuk mengelola waktu jeda
+last_sound_time = 0  # Timestamp terakhir suara dimainkan
+click_delay = 1  # Jeda untuk suara klik (detik)
+
+def play_sound_with_delay(sound, delay):
     """
     Mendeteksi simbol tangan berdasarkan posisi landmark.
 
@@ -24,7 +40,18 @@ def detect_hand_sign(landmarks, handedness):
     Returns:
         str: Simbol tangan yang terdeteksi ('0'-'5') atau None jika tidak terdeteksi.
     """
+    
+    global last_sound_time
+    current_time = time.time()
+    if current_time - last_sound_time >= delay:
+        sound.play()
+        last_sound_time = current_time
 
+def detect_hand_sign(landmarks, handedness):
+    """
+    Mendeteksi simbol tangan berdasarkan posisi landmark.
+    (Sama seperti sebelumnya.)
+    """
     # Untuk tangan kanan (handedness == 'Right')
     if handedness == "Right":
         # Mengecek apakah tangan membentuk simbol 'nol'
@@ -72,49 +99,48 @@ def detect_hand_sign(landmarks, handedness):
 def detect_operation(x, y):
     """
     Mendeteksi operasi matematika berdasarkan posisi landmark jari telunjuk.
-
-    Parameters:
-        x (int): Koordinat x jari telunjuk.
-        y (int): Koordinat y jari telunjuk.
-
-    Returns:
-        str: Simbol operasi matematika ('+', '-', '*', '/') atau None jika tidak terdeteksi.
     """
     for i, (symbol, label) in enumerate(operations.items()):
         if 10 <= x <= 60 and 50 + i * 50 <= y <= 90 + i * 50:
+            play_sound_with_delay(sound_click, click_delay)  # Suara dengan jeda
             return symbol
     return None
 
 def calculate_result(left, right, operation):
     """
     Menghitung hasil operasi matematika berdasarkan input tangan kiri, kanan, dan operasi.
-
-    Parameters:
-        left (str): Simbol angka yang terdeteksi pada tangan kiri.
-        right (str): Simbol angka yang terdeteksi pada tangan kanan.
-        operation (str): Simbol operasi matematika yang terdeteksi.
-
-    Returns:
-        float/int/str: Hasil perhitungan atau pesan error jika operasi tidak valid.
     """
+    global operation_processed, last_result
+
+    if operation_processed:
+        return last_result  # Jangan lakukan perhitungan ulang jika sudah diproses
+
     left = int(left)
     right = int(right)
+    result = None
+
     if operation == "+":
-        return left + right
-    if operation == "-":
-        return left - right
-    if operation == "*":
-        return left * right
-    if operation == "/" and right != 0:
-        return left / right
-    return "Error"
+        result = left + right
+    elif operation == "-":
+        result = left - right
+    elif operation == "*":
+        result = left * right
+    elif operation == "/" and right != 0:
+        result = left / right
+    else:
+        result = "Error"
+        sound_error.play()  # Suara error jika pembagian dengan nol
+
+    # Mainkan suara sukses hanya jika operasi valid
+    if result != "Error":
+        sound_success.play()
+
+    operation_processed = True  # Tandai bahwa operasi sudah diproses
+    last_result = result  # Simpan hasil terakhir
+    return result
 
 def main():
-    """
-    Fungsi utama untuk menjalankan kalkulator berbasis simbol tangan.
-    """
-    # Inisialisasi variabel global dalam fungsi main karena nilai variabel bisa berubah
-    global active_operation, left_hand_signs_detected, right_hand_signs_detected
+    global active_operation, left_hand_signs_detected, right_hand_signs_detected, operation_processed, last_result
 
     # Buka webcam
     cap = cv2.VideoCapture(0)
@@ -124,65 +150,62 @@ def main():
         if not ret:
             break
 
-        # Flip frame untuk tampilan lebih alami
         frame = cv2.flip(frame, 1)
         h, w, _ = frame.shape
 
-        # Proses deteksi tangan
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         results = hands.process(frame_rgb)
 
-        # Tampilkan menu operasi di kiri atas
+        # Gambar tombol operasi
         for i, (symbol, label) in enumerate(operations.items()):
             color = (0, 255, 0) if active_operation == symbol else (255, 255, 255)
             cv2.rectangle(frame, (10, 50 + i * 50), (60, 90 + i * 50), color, -1)
             cv2.putText(frame, symbol, (15, 85 + i * 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
 
-        # Deteksi tangan dan operasi
+        # Deteksi tangan
         if results.multi_hand_landmarks:
             for idx, hand_landmarks in enumerate(results.multi_hand_landmarks):
                 handedness = results.multi_handedness[idx].classification[0].label
                 mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
 
-                # Deteksi simbol tangan
                 hand_sign = detect_hand_sign(hand_landmarks.landmark, handedness)
                 if hand_sign:
                     if handedness == "Left" and hand_sign not in left_hand_signs_detected:
                         left_hand_signs_detected = [hand_sign]
+                        operation_processed = False  # Reset saat input berubah
                     elif handedness == "Right" and hand_sign not in right_hand_signs_detected:
                         right_hand_signs_detected = [hand_sign]
+                        operation_processed = False  # Reset saat input berubah
 
-                # Deteksi pilihan operasi
+                # Deteksi operasi berdasarkan posisi jari
                 x = int(hand_landmarks.landmark[8].x * w)
                 y = int(hand_landmarks.landmark[8].y * h)
                 selected_operation = detect_operation(x, y)
                 if selected_operation:
                     if selected_operation != active_operation:
-                        # Reset perhitungan jika operasi berubah
                         left_hand_signs_detected = []
                         right_hand_signs_detected = []
-                    active_operation = selected_operation
+                        active_operation = selected_operation
+                        operation_processed = False  # Reset saat operasi berubah
 
-        # Hitung hasil jika kedua tangan terdeteksi
+        # Tampilkan hasil perhitungan
         if active_operation and left_hand_signs_detected and right_hand_signs_detected:
             result = calculate_result(left_hand_signs_detected[0], right_hand_signs_detected[0], active_operation)
-            cv2.putText(frame, f"Result: {result}", (200, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
+            if result is not None:
+                cv2.putText(frame, f"Result: {result}", (200, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
 
-        # Tampilkan nilai masing-masing tangan
+        # Tampilkan input tangan kiri dan kanan
         if left_hand_signs_detected:
             cv2.putText(frame, f"Left: {left_hand_signs_detected[0]}", (200, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
         if right_hand_signs_detected:
             cv2.putText(frame, f"Right: {right_hand_signs_detected[0]}", (200, 200), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
-
-        # Tampilkan simbol operasi yang aktif
+        # Tampilkan operasi aktif
         if active_operation:
             cv2.putText(frame, f"Operation: {active_operation}", (200, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2)
 
-        # Tampilkan frame
         cv2.imshow("Hand Sign Calculator", frame)
 
-        # Keluar dari loop jika 'q' ditekan
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
 
