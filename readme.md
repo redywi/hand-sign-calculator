@@ -31,6 +31,7 @@ Proyek **Hand Sign Calculator** adalah filter berbasis Python yang memungkinkan 
 | 1          | [21/11/2024]     | - Inisialisasi proyek, eksplorasi Mediapipe, studi dokumentasi API Hand Landmarker, implementasi deteksi landmark tangan dan penentuan simbol angka menggunakan Mediapipe, pengintegrasian logika operasi matematika dan debugging hasil kalkulasi.      |  
 | 2          | [21/11/2024]     | - Menambahkan UI interaktif pada tampilan webcam untuk memilih, finalisasi program, dokumentasi proyek, dan README.md.                     | 
 | 3          | [13/12/2024]     | - Menambahkan efek suara untuk setiap interaksi. Yaitu dalam memilih operasi hitung, hasil operasi hitung dan juga error.                    |
+| - Memperbaiki UI lama menjadi lebih user-friendly |
 
 
 ---
