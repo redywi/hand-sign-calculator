@@ -69,15 +69,15 @@ Pastikan Anda sudah menginstal **Python 3.8** atau versi lebih baru di sistem An
 Tampilan layar program akan menunjukkan:
 ### 1. Menu Operasi: Daftar operasi matematika di sisi kiri atas layar.
 
-[Snapshots](./snapshots/menu_button.png)
+![Snapshots](./snapshots/menu_button.png)
 
 ### 2. Deteksi Angka: Angka dari tangan kiri dan kanan yang terdeteksi.
 
-[Snapshots](./snapshots/number_detection.png)
+![Snapshots](./snapshots/number_detection.png)
 
 ### 3. Hasil Perhitungan: Ditampilkan di bagian tengah layar.
 
-[Snapshots](./snapshots/result_indicator.png)
+![Snapshots](./snapshots/result_indicator.png)
 
 ---
 
