@@ -11,19 +11,19 @@ Proyek **Hand Sign Calculator** adalah filter berbasis Python yang memungkinkan 
 
 ## Anggota Tim  
 
-![Avatar](https://avatars.githubusercontent.com/u/113443626?v=4)
+<img src="https://avatars.githubusercontent.com/u/113443626?v=4" alt="Made Redy Wijaya" width="100" height="100" style="border-radius: 50%;">
 
 - **Nama Lengkap**: Made Redy Wijaya  
   **NIM**: 121140157  
   **GitHub**: [redywi](https://github.com/redywi)
 
-![Avatar](https://avatars.githubusercontent.com/u/90200753?v=4)  
+<img src="https://avatars.githubusercontent.com/u/90200753?v=4" alt="Farhan Apri Kesuma" width="100" height="100" style="border-radius: 50%;">
 
 - **Nama Lengkap**: Farhan Apri Kesuma  
   **NIM**: 121140179  
   **GitHub**: [parhannn](https://github.com/parhannn)
 
-![Avatar](https://avatars.githubusercontent.com/u/100509735?v=4)  
+<img src="https://avatars.githubusercontent.com/u/100509735?v=4" alt="Carlos Piero Parhusip" width="100" height="100" style="border-radius: 50%;">
 
 - **Nama Lengkap**: Carlos Piero Parhusip  
   **NIM**: 121140193  
