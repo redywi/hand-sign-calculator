@@ -10,17 +10,17 @@ Proyek **Hand Sign Calculator** adalah filter berbasis Python yang memungkinkan 
 ---
 
 ## Anggota Tim  
-- **Nama Lengkap**: [Made Redy Wijaya]  
-  **NIM**: [121140157]  
-  **GitHub**: [GitHub Anda](https://github.com/redywi)  
+- **Nama Lengkap**: Made Redy Wijaya  
+  **NIM**: 121140157  
+  **GitHub**: [redywi](https://github.com/redywi)  
 
-- **Nama Lengkap**: [Farhan Apri Kesuma]  
-  **NIM**: [121140179]  
-  **GitHub**: [GitHub Anda](https://github.com/parhannn)  
+- **Nama Lengkap**: Farhan Apri Kesuma  
+  **NIM**: 121140179  
+  **GitHub**: [parhannn](https://github.com/parhannn)  
 
-- **Nama Lengkap**: [Carlos Piero Parhusip]  
-  **NIM**: [121140193]  
-  **GitHub**: [GitHub Anda](https://github.com/gyoro2)  
+- **Nama Lengkap**: Carlos Piero Parhusip  
+  **NIM**: 121140193  
+  **GitHub**: [gyoro2](https://github.com/gyoro2)  
 
 
 ---
@@ -68,8 +68,16 @@ Pastikan Anda sudah menginstal **Python 3.8** atau versi lebih baru di sistem An
 ## Contoh Tampilan Program
 Tampilan layar program akan menunjukkan:
 ### 1. Menu Operasi: Daftar operasi matematika di sisi kiri atas layar.
+
+[Snapshots](./snapshots/menu_button.png)
+
 ### 2. Deteksi Angka: Angka dari tangan kiri dan kanan yang terdeteksi.
+
+[Snapshots](./snapshots/number_detection.png)
+
 ### 3. Hasil Perhitungan: Ditampilkan di bagian tengah layar.
+
+[Snapshots](./snapshots/result_indicator.png)
 
 ---
 
