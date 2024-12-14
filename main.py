@@ -101,7 +101,7 @@ def detect_operation(x, y):
     Mendeteksi operasi matematika berdasarkan posisi landmark jari telunjuk.
     """
     for i, (symbol, label) in enumerate(operations.items()):
-        if 10 <= x <= 60 and 50 + i * 50 <= y <= 90 + i * 50:
+        if 10 <= x <= 130 and 50 + i * 60 <= y <= 90 + i * 60:
             play_sound_with_delay(sound_click, click_delay)  # Suara dengan jeda
             return symbol
     return None
@@ -163,18 +163,16 @@ def main():
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         results = hands.process(frame_rgb)
 
-        # Gambar tombol operasi dengan ukuran yang sesuai teks
-        margin = 10  # Margin di sekitar teks
-        y_offset = 50  # Offset vertikal untuk tombol
+        # Lebar tetap untuk semua tombol
+        box_width = 120
+        margin = 10
+        y_offset = 50
 
+        # Gambar tombol untuk setiap operasi
         for i, (symbol, label) in enumerate(operations.items()):
-            text_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)
-            text_width, text_height = text_size[0]
-            text_baseline = text_size[1]
-
-            # Tentukan koordinat kotak berdasarkan ukuran teks
-            x1, y1 = 10, y_offset + i * (text_height + 2 * margin + 10)
-            x2, y2 = x1 + text_width + 2 * margin, y1 + text_height + 2 * margin
+            # Koordinat kotak 
+            x1, y1 = 10, y_offset + i * (30 + 2 * margin + 10)
+            x2, y2 = x1 + box_width, y1 + 30 + 2 * margin  
 
             # Warna kotak berdasarkan status aktif
             color_fill = (50, 205, 50) if active_operation == symbol else (255, 255, 255)
@@ -185,9 +183,12 @@ def main():
             cv2.rectangle(frame, (x1 + 2, y1 + 2), (x2 - 2, y2 - 2), color_fill, -1)
 
             # Tambahkan label pada tombol (teks di tengah kotak)
-            text_x = x1 + margin
-            text_y = y1 + text_height + margin
+            text_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)
+            text_width, text_height = text_size[0]
+            text_x = x1 + (box_width - text_width) // 2  # Pusatkan teks secara horizontal
+            text_y = y1 + margin + text_height
             cv2.putText(frame, label, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
+
 
         # Deteksi tangan
         if results.multi_hand_landmarks:
