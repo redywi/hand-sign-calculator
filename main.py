@@ -114,37 +114,45 @@ def detect_operation(x, y):
     return None
 
 def calculate_result(left, right, operation):
-    """
-    Menghitung hasil operasi matematika berdasarkan input tangan kiri, kanan, dan operasi.
-    """
+    """Ubah simbol operasi '*' menjadi 'x' sebelum ditampilkan."""
     global operation_processed, last_result
-
+    if operation == "*":
+        display_op = "x"
+    else:
+        display_op = operation
+    
     if operation_processed:
-        return last_result  # Jangan lakukan perhitungan ulang jika sudah diproses
-
+        return last_result, display_op
+    
     left = int(left)
     right = int(right)
     result = None
-
     if operation == "+":
         result = left + right
     elif operation == "-":
         result = left - right
-    elif operation == "*":
+    elif operation == "*" and right != 0:
         result = left * right
     elif operation == "/" and right != 0:
         result = left / right
     else:
         result = "Error"
-        sound_error.play()  # Suara error jika pembagian dengan nol
-
-    # Mainkan suara sukses hanya jika operasi valid
+        sound_error.play()
     if result != "Error":
         sound_success.play()
 
-    operation_processed = True  # Tandai bahwa operasi sudah diproses
-    last_result = result  # Simpan hasil terakhir
-    return result
+    operation_processed = True
+    last_result = result
+    return result, display_op
+
+def draw_text_with_stroke(img, text, position, font, scale, color_text, color_stroke, thickness_text, thickness_stroke):
+    """Fungsi untuk menambahkan teks dengan efek stroke di sekitar teks."""
+    x, y = position
+    # Tambahkan stroke hitam
+    for dx, dy in [(-1, -1), (-1, 1), (1, -1), (1, 1)]:
+        cv2.putText(img, text, (x + dx, y + dy), font, scale, color_stroke, thickness_stroke)
+    # Tambahkan teks utama
+    cv2.putText(img, text, (x, y), font, scale, color_text, thickness_text)
 
 def main():
     global active_operation, left_hand_signs_detected, right_hand_signs_detected, operation_processed, last_result
@@ -190,6 +198,9 @@ def main():
             cv2.putText(frame, label, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
 
 
+        draw_text_with_stroke(frame, "Hand Sign Calculator", (80, 40), cv2.FONT_HERSHEY_SIMPLEX, 
+                              1.5, (255, 255, 255), (0, 0, 0), 3, 5)
+
         # Deteksi tangan
         if results.multi_hand_landmarks:
             for idx, hand_landmarks in enumerate(results.multi_hand_landmarks):
@@ -215,22 +226,30 @@ def main():
                         right_hand_signs_detected = []
                         active_operation = selected_operation
                         operation_processed = False  # Reset saat operasi berubah
-                
- 
+
         # Tampilkan hasil 
         if active_operation and left_hand_signs_detected and right_hand_signs_detected:
-            result = calculate_result(left_hand_signs_detected[0], right_hand_signs_detected[0], active_operation)
+            result, display_op = calculate_result(left_hand_signs_detected[0], right_hand_signs_detected[0], active_operation)
             if result is not None:
-                display_text = f"{left_hand_signs_detected[0]} {active_operation} {right_hand_signs_detected[0]} = {result}"
-                text_size = cv2.getTextSize(display_text, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)[0]
-                text_x = 240
-                text_y = 40
-                background_x_end = text_x + text_size[0] + 10
-                background_y_end = text_y - text_size[1] - 10
+                display_text = f"{left_hand_signs_detected[0]} {display_op} {right_hand_signs_detected[0]} = {result}"
+                
+                # Tingkatkan ukuran font dan ketebalan
+                font_scale = 1.5  # Perbesar skala font
+                thickness = 3   # Perbesar ketebalan teks
+                text_size = cv2.getTextSize(display_text, cv2.FONT_HERSHEY_SIMPLEX, font_scale, thickness)[0]
+                
+                # Posisi teks
+                text_x = 180
+                text_y = 110
+                background_x_end = text_x + text_size[0] + 20  # Tambahkan padding untuk background
+                background_y_end = text_y - text_size[1] - 20
 
-                # Tambahkan latar belakang untuk teks
-                cv2.rectangle(frame, (text_x - 5, text_y + 5), (background_x_end, background_y_end), (0, 0, 0), -1)
-                cv2.putText(frame, display_text, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+                # Tambahkan latar belakang yang lebih besar
+                cv2.rectangle(frame, (text_x - 10, text_y + 25), (background_x_end, background_y_end), (0, 0, 0), -1)
+                
+                # Tambahkan teks hasil
+                cv2.putText(frame, display_text, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, font_scale, (255, 255, 255), thickness)
+
 
         cv2.imshow("Hand Sign Calculator", frame)
 
