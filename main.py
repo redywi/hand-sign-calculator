@@ -146,13 +146,6 @@ def calculate_result(left, right, operation):
     last_result = result  # Simpan hasil terakhir
     return result
 
-def draw_text_with_stroke(frame, text, position, font, scale, color, thickness, stroke_color, stroke_thickness):
-    # Gambar stroke hitam
-    x, y = position
-    cv2.putText(frame, text, (x, y), font, scale, stroke_color, stroke_thickness, lineType=cv2.LINE_AA)
-    # Gambar teks utama
-    cv2.putText(frame, text, (x, y), font, scale, color, thickness, lineType=cv2.LINE_AA)
-
 def main():
     global active_operation, left_hand_signs_detected, right_hand_signs_detected, operation_processed, last_result
 
@@ -223,30 +216,21 @@ def main():
                         active_operation = selected_operation
                         operation_processed = False  # Reset saat operasi berubah
                 
-                x = int(hand_landmarks.landmark[8].x * w)
-                y = int(hand_landmarks.landmark[8].y * h)
-                selected_operation = detect_operation(x, y)
-                if selected_operation:
-                    if selected_operation != active_operation:
-                        left_hand_signs_detected = []
-                        right_hand_signs_detected = []
-                        active_operation = selected_operation
-                        operation_processed = False
-
-        if left_hand_signs_detected:
-            draw_text_with_stroke(frame, f"Kiri: {left_hand_signs_detected[0]}", (200, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, (0, 0, 0), 3)
-        if right_hand_signs_detected:
-            draw_text_with_stroke(frame, f"Kanan: {right_hand_signs_detected[0]}", (200, 200), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, (0, 0, 0), 3)
-
-        # Tampilkan hasil
+ 
+        # Tampilkan hasil 
         if active_operation and left_hand_signs_detected and right_hand_signs_detected:
             result = calculate_result(left_hand_signs_detected[0], right_hand_signs_detected[0], active_operation)
             if result is not None:
-                draw_text_with_stroke(frame, f"Hasil: {result}", (200, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2, (0, 0, 0), 3)
-        
-        if active_operation:
-            operation_label = operations.get(active_operation, "")
-            draw_text_with_stroke(frame, f"Operasi: {operation_label}", (200, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2, (0, 0, 0), 3)
+                display_text = f"{left_hand_signs_detected[0]} {active_operation} {right_hand_signs_detected[0]} = {result}"
+                text_size = cv2.getTextSize(display_text, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)[0]
+                text_x = 240
+                text_y = 40
+                background_x_end = text_x + text_size[0] + 10
+                background_y_end = text_y - text_size[1] - 10
+
+                # Tambahkan latar belakang untuk teks
+                cv2.rectangle(frame, (text_x - 5, text_y + 5), (background_x_end, background_y_end), (0, 0, 0), -1)
+                cv2.putText(frame, display_text, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
 
         cv2.imshow("Hand Sign Calculator", frame)
 
