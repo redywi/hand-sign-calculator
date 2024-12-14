@@ -25,6 +25,8 @@ active_operation = None
 operation_processed = False  # Flag untuk memastikan operasi hanya diproses sekali
 last_result = None  # Variabel untuk menyimpan hasil terakhir
 operations = {"+": "Tambah", "-": "Kurang", "*": "Kali", "/": "Bagi"}
+selected = None
+last_selected = None
 
 # Variabel untuk mengelola waktu jeda
 last_sound_time = 0  # Timestamp terakhir suara dimainkan
@@ -100,10 +102,15 @@ def detect_operation(x, y):
     """
     Mendeteksi operasi matematika berdasarkan posisi landmark jari telunjuk.
     """
+    global selected, last_selected
+    selected = False
     for i, (symbol, label) in enumerate(operations.items()):
         if 10 <= x <= 130 and 50 + i * 60 <= y <= 90 + i * 60:
-            play_sound_with_delay(sound_click, click_delay)  # Suara dengan jeda
+            if last_selected != symbol:
+                play_sound_with_delay(sound_click, click_delay)
+                last_selected = symbol
             return symbol
+    last_selected = None
     return None
 
 def calculate_result(left, right, operation):
