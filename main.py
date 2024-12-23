@@ -205,7 +205,6 @@ def main():
         if results.multi_hand_landmarks:
             for idx, hand_landmarks in enumerate(results.multi_hand_landmarks):
                 handedness = results.multi_handedness[idx].classification[0].label
-                mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
 
                 hand_sign = detect_hand_sign(hand_landmarks.landmark, handedness)
                 if hand_sign:

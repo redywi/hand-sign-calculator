@@ -39,6 +39,8 @@ Proyek **Hand Sign Calculator** adalah filter berbasis Python yang memungkinkan 
 | 2          | [21/11/2024]     | - Menambahkan UI interaktif pada tampilan webcam untuk memilih, finalisasi program, dokumentasi proyek, dan README.md.                     | 
 | 3          | [13/12/2024]     | - Menambahkan efek suara untuk setiap interaksi. Yaitu dalam memilih operasi hitung, hasil operasi hitung dan juga error.                    |
 | 3          | [13/12/2024]     | - Memperbaiki UI lama menjadi lebih user-friendly.                    |
+| 4          | [16/12/2024]     | - Membuat pelaporan menggunakan LaTex dengan Overleaf sebagai compiler online **[Link Laporan](https://www.overleaf.com/project/67400b14b896283a47afc602)**.                    |
+| 5          | [23/12/2024]     | - Mengecek kembali program tidak ada lagi bug atau glitch yang ada dan menyembunyikan landmark pada kamera demi kenyamanan pengguna.                    |
 
 
 ---
@@ -85,6 +87,10 @@ Tampilan layar program akan menunjukkan:
 ### 3. Hasil Perhitungan: Ditampilkan di bagian tengah layar.
 
 ![Snapshots](./snapshots/result_indicator.png)
+
+### 4. Hasil Akhir Program
+
+![Snapshots](./snapshots/result.png)
 
 ---
 
