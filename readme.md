@@ -54,7 +54,7 @@ Pastikan Anda sudah menginstal **Python 3.8** atau versi lebih baru di sistem An
    git clone https://github.com/redywi/hand-sign-calculator.git  
    cd hand-sign-calculator
     ```
-1. Instal dependensi menggunakan requirements.txt:  
+2. Instal dependensi menggunakan requirements.txt:  
    ```bash  
    pip install -r requirements.txt  
     ```
