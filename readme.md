@@ -1,5 +1,5 @@
 # Hand Sign Calculator  
-Proyek **Hand Sign Calculator** adalah filter berbasis Python yang memungkinkan pengguna untuk melakukan operasi matematika sederhana dengan menggunakan gestur tangan sebagai input. Aplikasi ini memanfaatkan teknologi Mediapipe untuk mendeteksi simbol tangan dan memilih operasi matematika seperti penjumlahan, pengurangan, perkalian, dan pembagian. Project ini dibuat untuk memenuhi Ujian Akhir Semester mata kuliah **IF4021-Sistem/Teknologi Multimedia** program studi Teknik Informatika yang diampu oleh **Martin Clinton Tosima Manullang, S.T., M.T.**
+Proyek **Hand Sign Calculator** adalah filter berbasis Python yang memungkinkan pengguna untuk melakukan operasi matematika sederhana dengan menggunakan gestur tangan sebagai input. Aplikasi ini memanfaatkan teknologi Mediapipe untuk mendeteksi simbol tangan dan memilih operasi matematika seperti penjumlahan, pengurangan, perkalian, dan pembagian. Project ini dibuat untuk memenuhi Ujian Akhir Semester mata kuliah **IF4021-Sistem/Teknologi Multimedia** program studi Teknik Informatika yang diampu oleh **Martin Clinton Tosima Manullang, S.T., M.T.** (**[mctosima](https://github.com/mctosima)**)
 
 ## Fitur Utama  
 - Deteksi gestur angka menggunakan landmark tangan dari Mediapipe.  
